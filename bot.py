@@ -1,67 +1,142 @@
 
+import random 
+import pandas as pd
+import time
+import os
 from selenium import webdriver
-#import pandas as pd
 from selenium.webdriver.common.keys import Keys
-#driver = webdriver.Chrome()
-class linkedinBot:
+from pynput.mouse import Button, Controller
 
+class linkedinBot:
+    
+    #input through csv
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.driver = webdriver.Chrome("./chromedriver")
+        self.driver = webdriver.Chrome("./chromedriver")  #declaring the driver basically we are telling it to open chrome broswer
+       
 
     def closeBrowser(self):
         self.driver.close()
 
     def login(self):
-        driver = self.driver
-        driver.get("https://www.linkedin.com/login?")
+        driver = self.driver #making instance
+        driver.get("https://www.linkedin.com/login?") #calling linkedin
+        
+        #finding login button with xpath
         login_button = driver.find_element_by_xpath('//*[@type="submit"]')
         login_button.click()
-       # time.sleep(2)
+
+        time.sleep(20)
+
+        #finding usernameBox button with xpath
         username_elem = driver.find_element_by_xpath('//*[@id="username"]')
         username_elem.clear()
         username_elem.send_keys(self.username)
 
+        time.sleep(20)
+
+        #finding passwordBox button with xpath
         passworword_elem = driver.find_element_by_xpath('//*[@id="password"]')
         passworword_elem.clear()
         passworword_elem.send_keys(self.password)
+        
+        #
         passworword_elem.send_keys(Keys.RETURN)
-#//*[@id="ember105"]/span/span
+    
+    def logout(self):
+        driver = self.driver
+        dropdownButton = driver.find_element_by_css_selector('#nav-settings__dropdown-trigger')
+        dropdownButton.click()
+        
+        time.sleep(20)
 
-       # driver.switch_to_window('https://dms.licdn.com/playlist/C5605AQHA1-eNv1bxgQ/feedshare-captions-thumbnails-dualWrite-inhouse-mp4_h264_aac_1600k/0?e=1576922400&v=beta&t=1Jyh6ZqGr4ZTebHpmwZ8MwLn4eSWWp8CdN3NpQcCSl4')
+        signoutButton = driver.find_element_by_xpath('//*[@href="/m/logout/"]')
+        signoutButton.click()
+
+
 
     def like_photo(self):
         driver = self.driver
-        driver.get("https://www.linkedin.com/posts/trell-employee1-82a17319a_ohayo-activity-6613784927496441856-PFml")
-            
-            
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # try:
+        driver.get("https://www.linkedin.com/posts/rudresh-kapoor-bbbbb88b_thailands-wealthiest-man-dhanin-chearavanont-activity-6612381063052386304-Ur9j/")
         
-        #     driver.find_element_by_partial_link_text("Like Trell Employee1's post").click()
+        self.like_button = driver.find_element_by_class_name("react-button__trigger")
+        self.like_button.click()
+        
+    def like_photo1(self,pl):
+        driver = self.driver
+        driver.implicitly_wait(20000)
+        time.sleep(2)
+        driver.get(pl) #taking postLink as input
+        
+        self.like_button = driver.find_element_by_class_name("react-button__trigger")
+        self.like_button.click()
+        
+    def movement(self):   #function for movements of mouse so that its cant detect its a bot
+        mouse = Controller()
+        mouse.position = (10, 20)
+        mouse.move(60, -150)
+        mouse.move(20, -17)
+        mouse.move(30, -40)
+        mouse.scroll(0, 2)
+        mouse.scroll(0, -100)    
+        mouse.scroll(0,-120)    
+
+driver = webdriver.Chrome("./chromedriver")
+
+df = pd.read_csv("uid.csv",usecols=['username','password'])
+
+l=[]
+
+i,j=10,0
+
+while i>0: #j=len(df)
+    # x=2
+    # while(x>0):
+    #     rand=random.randint(0,2)
+    #     if rand in l:
+    #        continue
+    #     else:
+    #         l.append(rand)
+    #         j=rand
+    #     x-=1     
     
-               
-        # except Exception :
-        #     pass
+    us=df.username[j]
+    ps=df.password[j]
+    j+=1
+    raji1= linkedinBot(us,ps)
+    raji1.login()
+    time.sleep(20)
+    raji1.like_photo()
+    time.sleep(10)
+    raji1.movement()
+    raji1.logout()
+    time.sleep(60)
+    raji1.closeBrowser()
+  #  driver = raji1.driver
+    driver.get("https://www.google.com/")
+    #time.sleep(10)
+    bro="chrome.exe"
+    os.system("taskkill /f /im "+ bro)
+        
+    #driver.implicitly_wait(600000)
+    
+    i-=1
+    
+i,j=7,0
+while i>0:
+    us=df.username[j]
+    ps=df.password[j]
+    j+=1
+    raji1= linkedinBot(us,ps)
+    raji1.login()
+    df1= pd.read_csv("post.csv")
+    for k in range(len(df1)):
+        raji1.like_photo1(df1.PostLink[k])
 
 
-        driver.get("https://www.linkedin.com/posts/trell-employee1-82a17319a_hello-world-activity-6613761565021827072-bok1")
-        like_button = driver.find_element_by_partial_link_text("Like Trell Employee1's post").click()
-        like_button.click()
-        #self.closeBrowser()
-
-rajiIG0 = linkedinBot("trellemployee1@gmail.com","muj#1234")
-rajiIG0.login()
-rajiIG0.like_photo()
-#//*[@id="ember105"]/span/span
-
-rajiIG1= linkedinBot("trellemployee2@gmail.com","muj#1234")
-rajiIG1.login()
-rajiIG1.like_photo()
-# rajiIG1.closeBrowser()
-# rajiIG2= linkedinBot("trellemployee3@gmail.com","muj#1234")
-# rajiIG2.login()
-# rajiIG2.like_photo()
-# rajiIG2.closeBrowser()
-
+    i-=1
+    raji1.logout()
+    time.sleep(60)
+    #driver.implicitly_wait(600000)
+    time.sleep(60)
